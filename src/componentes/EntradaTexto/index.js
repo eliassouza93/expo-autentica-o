@@ -2,15 +2,35 @@ import { useState } from 'react';
 import { TextInput, HelperText } from 'react-native-paper';
 import estilos from './estilos';
 
-export function EntradaTexto({ label, value, onChangeText, secureTextEntry, error, messageError }) {
+export function EntradaTexto({ 
+  label, 
+  value, 
+  onChangeText, 
+  secureTextEntry, 
+  error, 
+  messageError,
+  pattern 
+}) {
   const [secureMode, setSecureMode] = useState(secureTextEntry);
+
+  function regexValidation() {
+    if(!value) return false;
+    if (pattern) {
+      const condition = new RegExp(pattern);
+      return !condition.test(value);
+    }
+
+    return false;
+  }
+
+  const showError = value == null || error || regexValidation();
 
   return (
     <>
       <TextInput
         label={label}
         value={value}
-        error={error}
+        error={showError}
         secureTextEntry={secureMode}
         onChangeText={onChangeText}
         style={estilos.input}
@@ -24,7 +44,7 @@ export function EntradaTexto({ label, value, onChangeText, secureTextEntry, erro
           /> : null
         }
       />
-      {error && <HelperText type="error" visible={error}>
+      {showError && <HelperText type="error" visible={showError}>
         {messageError}
       </HelperText>}
     </>

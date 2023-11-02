@@ -1,77 +1,76 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Image } from 'react-native';
 import Botao from '../../componentes/Botao';
 import { EntradaTexto } from '../../componentes/EntradaTexto';
 import { logar } from '../../servicos/requisicoesFirebase';
 import estilos from './estilos';
 import { Alerta } from '../../componentes/Alerta';
 import { auth } from '../../config/firebase';
+import { alteraDados, verificaSeTemEntradaVazia } from '../../utils/comum';
+import { entradas } from './entradas';
+
+ 
 
 export default function Login({ navigation }) {
-  const [statusError, setStatusError] = useState('');
-  const [mensagemError, setMensagemError] = useState('');
-
   const [dados, setDados] = useState({
     email: '',
     senha: ''
   })
-  const alteraDados = (variavel, valor) => {
-    setDados({
-      ...dados,
-      [variavel]: valor
-    })
 
-  }
+  const [statusError, setStatusError] = useState('');
+  const [mensagemError, setMensagemError] = useState('');
+  const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
     const estadoUsuario = auth.onAuthStateChanged(usuario => {
       if (usuario) {
         navigation.replace('Principal')
       }
+      setCarregando(false)
     })
     return () => estadoUsuario();
   }, [])
 
   async function realizarLogin() {
-    if (dados.email == '') {
-      setMensagemError('O email é obrigatório!');
-      setStatusError('email');
-    } else if (dados.senha == '') {
-      setMensagemError('A senha é obrigatória!');
-      setStatusError('senha');
-    } else {
-      const resultado = await logar(dados.email, dados.senha);
-      if (resultado == 'erro') {
-        setStatusError('firebase')
-        setMensagemError('Email ou senha não conferem')
-      }
-      else {
-        navigation.replace('Principal')
-      }
+    // funcao para verificar se email ou senha sao vazios
+    if (verificaSeTemEntradaVazia(dados, setDados)) return
+
+    const resultado = await logar(dados.email, dados.senha)
+    if (resultado == 'erro') {
+      setStatusError(true)
+      setMensagemError('E-mail ou senha não conferem')
+      return
     }
+    navigation.replace('Principal')
+  }
+
+  if (carregando) {
+    return (
+      <View style={estilos.containerAnimacao}>
+        
+        
+      </View>
+    )
   }
 
   return (
     <View style={estilos.container}>
-      <EntradaTexto
-        label="E-mail"
-        value={dados.email}
-        onChangeText={valor => alteraDados('email', valor)}
-        error={statusError == 'email'}
-        messageError={mensagemError}
-      />
-      <EntradaTexto
-        label="Senha"
-        value={dados.senha}
-        onChangeText={valor => alteraDados('senha', valor)}
-        secureTextEntry
-        error={statusError == 'senha'}
-        messageError={mensagemError}
-      />
+      {
+        entradas.map((entrada) => {
+          return (
+            <EntradaTexto
+              key={entrada.id}
+              {...entrada}
+              value={dados[entrada.name]}
+              onChangeText={valor => alteraDados(entrada.name, valor, dados, setDados)}
+            />
+          )
+        })
+      }
 
       <Alerta
         mensagem={mensagemError}
-        error={statusError == 'firebase'}
+        error={statusError}
         setError={setStatusError}
       />
 
