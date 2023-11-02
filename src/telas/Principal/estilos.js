@@ -5,7 +5,7 @@ export default StyleSheet.create({
     flex: 1,
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    paddingTop: 25,
+    paddingTop: 50,
   },
   texto: {
     fontSize: 20,
