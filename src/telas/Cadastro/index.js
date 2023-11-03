@@ -8,7 +8,7 @@ import { Alerta } from '../../componentes/Alerta';
 import { alteraDados, verificaSeTemEntradaVazia } from '../../utils/comum';
 import { entradas } from './entradas';
 
-export default function Cadastro({ navigation }) {  
+export default function Cadastro({ navigation }) {
   const [dados, setDados] = useState({
     email: '',
     senha: '',
@@ -18,23 +18,25 @@ export default function Cadastro({ navigation }) {
   const [statusError, setStatusError] = useState('');
   const [mensagemError, setMensagemError] = useState('');
 
-  function verificaSeSenhasSaoIguais(){
+  function verificaSeSenhasSaoIguais() {
     return dados.senha != dados.confirmaSenha
   }
 
-  async function realizarCadastro(){
-    if(verificaSeTemEntradaVazia(dados, setDados)) return
-    if(dados.senha != dados.confirmaSenha) {
+  async function realizarCadastro() {
+    if (verificaSeTemEntradaVazia(dados, setDados)) return 
+    if (dados.senha != dados.confirmaSenha) {
       setStatusError(true)
       setMensagemError('As senhas não conferem')
       return
     }
 
     const resultado = await cadastrar(dados.email, dados.senha);
-    if(resultado != 'sucesso'){
+    if (resultado != 'sucesso') {
+ 
       setStatusError(true)
       setMensagemError(resultado)
     }
+    
   }
 
   return (
@@ -48,19 +50,19 @@ export default function Cadastro({ navigation }) {
               value={dados[entrada.name]}
               onChangeText={valor => alteraDados(entrada.name, valor, dados, setDados)}
               error={entrada.name != 'confirmaSenha' ? false
-              : verificaSeSenhasSaoIguais() && dados.confirmaSenha != ''
-            }
-            />  
+                : verificaSeSenhasSaoIguais() && dados.confirmaSenha != ''
+              }
+            />
           )
         })
       }
 
-      <Alerta 
+      <Alerta
         mensagem={mensagemError}
         error={statusError}
         setError={setStatusError}
       />
-      
+
       <Botao onPress={() => realizarCadastro()}>CADASTRAR</Botao>
     </View>
   );

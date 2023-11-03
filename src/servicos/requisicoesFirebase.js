@@ -1,13 +1,13 @@
 import { auth } from "../config/firebase";
-import { 
-  createUserWithEmailAndPassword, 
+import {
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  AuthErrorCodes 
+  AuthErrorCodes
 } from "firebase/auth";
 
-function errosFirebase(error){
+function errosFirebase(error) {
   let mensagem = '';
-  switch(error.code) {
+  switch (error.code) {
     case AuthErrorCodes.EMAIL_EXISTS:
       mensagem = "Esse email já está em uso";
       break;
@@ -18,34 +18,34 @@ function errosFirebase(error){
       mensagem = "A senha precisa de no minimo 6 caracteres";
       break;
     default:
-      mensagem="Erro desconhecido";
+      mensagem = "Erro desconhecido";
   }
   return mensagem;
 }
 
 export async function cadastrar(email, senha) {
   const resultado = await createUserWithEmailAndPassword(auth, email, senha)
-  .then((dadosDoUsuario) => {
-    console.log(dadosDoUsuario)
-    return "sucesso"
-  })
-  .catch((error) => {
-    console.log(error);
-    return errosFirebase(error)
-  });
+    .then((dadosDoUsuario) => {
+      console.log(dadosDoUsuario)
+      return "sucesso"
+    })
+    .catch((error) => {
+      console.log(error);
+      return errosFirebase(error)
+    });
 
   return resultado
 }
 
 export async function logar(email, senha) {
   const resultado = await signInWithEmailAndPassword(auth, email, senha)
-  .then((dadosDoUsuario) => {
-    console.log(dadosDoUsuario)
-    return "sucesso"
-  })
-  .catch((error) => {
-    console.log(error);
-    return "erro"
-  });
+    .then((dadosDoUsuario) => {
+      console.log(dadosDoUsuario)
+      return "sucesso"
+    })
+    .catch((error) => {
+      console.log(error);
+      return "erro"
+    });
   return resultado
 }
